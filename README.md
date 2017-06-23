@@ -53,15 +53,15 @@ What you should worry right now is filling up the `scheme` (ftp or sftp), `host`
 
 The names of the sections (`production` and `staging` in the above example) are important as they can be referred to while running commands. Steer supports a configuration with multiple servers and can even deploy to them all at once.
 
-#### FTP
+### FTP
 
 FTP needs the `host`, `port` (usually: 21), `username`, `password` and an absolute `path` to the root folder of your project.
 
-#### SFTP
+### SFTP
 
 For SFTP you can user either a combination of `username` and `password`, or a password-less authentication by setting a `privatekey` with the path to the private key. The `path` may be relative to the remote user's base directory or absolute.
 
-### Deploy
+## Deploy
 
 With the configuration ready, nothing stops you from going hot. Just run:
 
@@ -102,7 +102,7 @@ The `commit` and `fresh` options can be used alongside server arguments:
 steer deploy production -c=SOMEHASH
 ```
 
-### Preview
+## Preview
 
 Before running a deploy, it's generally not a bad idea to do a preview run. This command gets the revision, calculates which files have changed and only displays them, without uploading anything on the server. It's especially useful on big updates.
 
@@ -116,7 +116,7 @@ As with deploys, you can pass a list of servers as arguments, and the `--all` an
 steer preview staging -c=SOMEHASH
 ```
 
-### Sync
+## Sync
 
 Deployment will read the remote revision file and push the files that were changed since that commit. Sometimes however, you may need to manually update the remote revision. Maybe you've made some quick changes, both locally and on the server, so there's no need to deploy those files. More probably, you may hear of steer while some of your projects are online. In that case, you can sync the project's current state, without the need to do deploy all the files.
 
@@ -130,7 +130,7 @@ With the command executed, the remote revision will hold the latest commit and b
 steer sync --all
 ```
 
-### Versions
+## Versions
 
 Steer can behave in a way vaguely similar to deployment tools like Capistrano or Rocketeer, albeit much more lightweight. When versions is activated, steer will no longer deploy to the base path as usual, but instead inside a `versions` directory. Every deploy will create a new directory that holds the whole project. Example:
 
@@ -168,7 +168,7 @@ Disable versions:
 steer deploy --no-verions
 ```
 
-### Logging
+## Logging
 
 A simple logger is available that writes on the server a `.steer-log` with information about the deployment: date and time, commit and number of changed files. By default it's disabled, but can be easily enabled by setting a `logger` configuration option:
 
@@ -203,7 +203,7 @@ Finally, you can even delete the log file completely by typing:
 steer log --clear
 ```
 
-### File Includes and Excludes
+## File Includes and Excludes
 
 File includes are files or directories that you want to include in the deployment, even though they aren't tracked by git. File excludes are the opposite: files or directories that may be tracked by git, but you don't want to deploy. Directories aren't read recursively, meaning that only the files inside a specified directory will be added or removed, not the contents of sub directories.
 
@@ -216,7 +216,7 @@ include = file1.css, file2.js, vendor
 exclude = css/vendor.css
 ```
 
-### Getting Help
+## Getting Help
 
 Steer's commands and options are well documented and most of the time, you won't need any more documentation. For general help type:
 
@@ -230,7 +230,7 @@ For information on a specific command and it's options, type:
 steer deploy -h
 ```
 
-### Credits
+## Credits
 
 Steer was developed by Fadion Dashi, a freelance web and mobile developer from Tirana.
 
