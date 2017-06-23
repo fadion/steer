@@ -1,0 +1,43 @@
+hash: 0e5c13449502ac74e80c31f9c9532d69c7a26b9b5145d5a15182b03a812df1ea
+updated: 2017-06-20T00:08:26.041686178+02:00
+imports:
+- name: github.com/briandowns/spinner
+  version: 48dbb65d7bd5c74ab50d53d04c949f20e3d14944
+- name: github.com/cheggaaa/pb
+  version: 4a1bf7a97d1348c5b50aabf6e1eb0496ca0a3d33
+- name: github.com/dutchcoders/goftp
+  version: ed59a591ce14ff6c19c49be14294528d11a88c37
+- name: github.com/fatih/color
+  version: 570b54cabe6b8eb0bc2dfce68d964677d63b5260
+- name: github.com/go-ini/ini
+  version: d3de07a94d22b4a0972deb4b96d790c2c0ce8333
+- name: github.com/kr/fs
+  version: 2788f0dbd16903de03cb8186e5c7d97b69ad387b
+- name: github.com/mattn/go-colorable
+  version: 5411d3eea5978e6cdc258b30de592b60df6aba96
+  repo: https://github.com/mattn/go-colorable
+- name: github.com/mattn/go-isatty
+  version: 57fdcb988a5c543893cc61bce354a6e24ab70022
+  repo: https://github.com/mattn/go-isatty
+- name: github.com/pkg/errors
+  version: c605e284fe17294bda444b34710735b29d1a9d90
+- name: github.com/pkg/sftp
+  version: 516f73358825b579ad5ddaf6abb80346bd96e54c
+- name: github.com/urfave/cli
+  version: 0bdeddeeb0f650497d603c4ad7b20cfe685682f6
+- name: golang.org/x/crypto
+  version: e1a4589e7d3ea14a3352255d04b6f1a418845e5e
+  subpackages:
+  - curve25519
+  - ed25519
+  - ed25519/internal/edwards25519
+  - ssh
+  - ssh/terminal
+- name: golang.org/x/sys
+  version: e24f485414aeafb646f6fca458b0bf869c0880a1
+  repo: https://go.googlesource.com/sys
+  subpackages:
+  - unix
+- name: gopkg.in/cheggaaa/pb.v1
+  version: 4a1bf7a97d1348c5b50aabf6e1eb0496ca0a3d33
+testImports: []
