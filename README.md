@@ -12,7 +12,7 @@ A config file is saved in the root of the local project that holds the configura
 
 While there are plenty of deployment tools that try to do a lot, not everyone needs all of their features. Teams of developers will obviously have a great setup, with jobs, hooks, commands and so on. The rest, freelancers, hobbyists or solo developers just want to get the job done and not worry about infrustructure. Steer doesn't try to do more than it should and with its simple approach, it lets the developer worry about code.
 
-### Installation
+## Installation
 
 This is still a pre-release. I'm working on setting up a good testing environment, finding a good way to deliver binaries and self upgrading. All of those should hopefully happen within a couple of weeks. For now, you can only `go get github.com/fadion/steer` and `go install` it yourself.
 
