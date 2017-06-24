@@ -109,6 +109,11 @@ func main() {
 			},
 			Action: commands.Log,
 		},
+		{
+			Name:  "update",
+			Usage: "Update steer to the latest version",
+			Action: commands.Update,
+		},
 	}
 
 	app.CommandNotFound = func(ctx *cli.Context, command string) {

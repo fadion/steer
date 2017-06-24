@@ -14,7 +14,7 @@ While there are plenty of deployment tools that try to do a lot, not everyone ne
 
 ## Installation
 
-This is still a pre-release. I'm working on setting up a good testing environment, finding a good way to deliver binaries and self upgrading. All of those should hopefully happen within a couple of weeks. For now, you can only `go get github.com/fadion/steer` and `go install` it yourself.
+Steer is still a pre-release
 
 ## Setup
 
