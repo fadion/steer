@@ -1,14 +1,14 @@
 package commands
 
 import (
-	"github.com/urfave/cli"
-	"github.com/fatih/color"
-	"github.com/briandowns/spinner"
+	"fmt"
 	"time"
 	"os"
 	"runtime"
 	"bytes"
-	"fmt"
+	"github.com/urfave/cli"
+	"github.com/briandowns/spinner"
+	"github.com/fatih/color"
 )
 
 // Update steer executable to the latest version.
