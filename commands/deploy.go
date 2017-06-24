@@ -125,18 +125,18 @@ func Deploy(ctx *cli.Context) error {
 			if isversioned {
 				color.Yellow("Project deployed successfully on: %s", strings.TrimRight(versionfolder, "/"))
 			} else {
-				//spin.Prefix = "Writing remote revision file "
-				//spin.Start()
-				//
-				//remoteCfg := config.NewRemote(conn)
-				//err := remoteCfg.Write(™commit)
-				//spin.Stop()
-				//
-				//if err != nil {
-				//	color.Red("\nProject deployed, but remote revision couldn't be written. Try running 'steer sync'.")
-				//} else {
-				//	color.Yellow("\nProject deployed successfully.")
-				//}
+				spin.Prefix = "Writing remote revision file "
+				spin.Start()
+
+				remoteCfg := config.NewRemote(conn)
+				err := remoteCfg.Write(commit)
+				spin.Stop()
+
+				if err != nil {
+					color.Red("\nProject deployed, but remote revision couldn't be written. Try running 'steer sync'.")
+				} else {
+					color.Yellow("\nProject deployed successfully.")
+				}
 			}
 		}
 	})

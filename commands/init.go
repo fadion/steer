@@ -14,10 +14,9 @@ func Init(ctx *cli.Context) error {
 
 	if localcfg.Exists() && !force {
 		color.Red(".steer file already exists in the project.")
-
 		// Ask to override the config file.
 		if !askForConfirmation("Want to override it with the template?") {
-			os.Exit(0)
+			os.Exit(1)
 		}
 	}
 

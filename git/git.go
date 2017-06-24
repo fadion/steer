@@ -29,6 +29,16 @@ const (
 	UNKNOWN  = "unknown"
 )
 
+var operation = map[rune]string{
+	'A': ADDED,
+	'C': COPIED,
+	'D': DELETED,
+	'M': MODIFIED,
+	'R': RENAMED,
+	'T': TYPE,
+	'U': UNKNOWN,
+}
+
 // Initialise a Version struct.
 func New(branch string) (*Version, error) {
 	v := Version{Branch: branch}
@@ -40,7 +50,7 @@ func New(branch string) (*Version, error) {
 }
 
 // List files that have changed.
-func (v *Version) Changes(remote string, local string) []File {
+func (v *Version) Changes(remote, local string) []File {
 	if remote == "" {
 		return v.lsfiles()
 	} else {
@@ -68,7 +78,7 @@ func (v *Version) Checkout(branch string) error {
 
 	// Non existing branches or those that have local modifications,
 	// produce an error message as in: "error:..."
-	if len(lines[0]) > 5 && lines[0][:5] == "error" {
+	if strings.Contains(lines[0], "error:") {
 		return fmt.Errorf("Branch '%s' doesn't exist or modifications need to be stashed.", branch)
 	}
 
@@ -99,7 +109,9 @@ func (v *Version) lsfiles() []File {
 }
 
 // List files by running diff.
-func (v *Version) diff(remote string, local string) []File {
+func (v *Version) diff(remote, local string) []File {
+	// Set the local commit to HEAD just for consistence,
+	// as it doesn't make much of a difference.
 	if local == "" {
 		local = "HEAD"
 	}
@@ -113,33 +125,21 @@ func (v *Version) diff(remote string, local string) []File {
 	var list []File
 
 	// Each line represents a different file with the type
-	// of change: M file.ext
+	// of change. Ie:
+	// M file.ext
+	// A file2.ext
 	for scanner.Scan() {
 		line := scanner.Text()
 		op, file := line[0], strings.TrimSpace(line[1:])
 
-		var operation string
-
-		switch op {
-		case 'A':
-			operation = ADDED
-		case 'C':
-			operation = COPIED
-		case 'M':
-			operation = MODIFIED
-		case 'R':
-			operation = RENAMED
-		case 'D':
-			operation = DELETED
-		case 'T':
-			operation = TYPE
-		default:
-			operation = UNKNOWN
+		operat := operation[rune(op)]
+		if operat == "" {
+			operat = UNKNOWN
 		}
 
 		list = append(list, File{
 			Name:      file,
-			Operation: operation,
+			Operation: operat,
 		})
 	}
 

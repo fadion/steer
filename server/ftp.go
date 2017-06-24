@@ -46,7 +46,7 @@ func (f *ftp) MkDir(path string) error {
 }
 
 // Upload a file.
-func (f *ftp) Upload(path string, destination string) error {
+func (f *ftp) Upload(path, destination string) error {
 	file, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("%s couldn't be opened. Make sure it exists.\n", path)

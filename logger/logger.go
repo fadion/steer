@@ -24,7 +24,6 @@ func New(conn *server.Connection) *Log {
 
 func (l *Log) Read() (string, error) {
 	contents, err := l.conn.Read(l.file)
-
 	if err != nil {
 		return "", err
 	}
@@ -33,12 +32,11 @@ func (l *Log) Read() (string, error) {
 }
 
 // Write the log file in the server.
-func (l *Log) Write(nrfiles int, branch string, commit string, message string) error {
+func (l *Log) Write(nrfiles int, branch, commit, message string) error {
 	now := time.Now().Format("2006-01-02 03:04:05 -0700")
-	contents := now + " | Commit: " + commit + " | Branch: " + branch +
-		" | Changed Files: " + fmt.Sprintf("%d", nrfiles)
+	contents := fmt.Sprintf("%s | Commit: %s | Branch: %s | Changed Files: %d", now, commit, branch, nrfiles)
 	if message != "" {
-		contents += " | Message: " + message
+		contents += fmt.Sprintf(" | Message: %s", message)
 	}
 
 	remote, err := l.Read()
@@ -57,15 +55,14 @@ func (l *Log) Write(nrfiles int, branch string, commit string, message string) e
 	}
 
 	_, err = f.WriteString(remote)
-
 	if err != nil {
 		return err
 	}
 
-	f.Sync()
-
 	defer f.Close()
 	defer os.Remove(l.file)
+
+	f.Sync()
 
 	err = l.conn.Upload(l.file, l.file)
 	if err != nil {

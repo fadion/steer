@@ -30,7 +30,7 @@ func (c *Connection) MkDir(path string) error {
 }
 
 // Upload a file.
-func (c *Connection) Upload(path string, destination string) error {
+func (c *Connection) Upload(path, destination string) error {
 	if err := c.driver.Upload(path, destination); err != nil {
 		return err
 	}

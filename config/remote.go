@@ -41,15 +41,13 @@ func (c *RemoteConfig) Write(rev string) error {
 	defer os.Remove(c.file)
 
 	_, err = f.WriteString(rev)
-
 	if err != nil {
 		return err
 	}
 
 	f.Sync()
 
-	err = c.conn.Upload(c.file, c.file)
-	if err != nil {
+	if err = c.conn.Upload(c.file, c.file); err != nil {
 		return err
 	}
 

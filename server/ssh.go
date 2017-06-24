@@ -91,7 +91,7 @@ func (s *sftp) MkDir(path string) error {
 }
 
 // Upload a file.
-func (s *sftp) Upload(path string, destination string) error {
+func (s *sftp) Upload(path, destination string) error {
 	file, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("%s couldn't be opened. Make sure it exists.\n", path)
