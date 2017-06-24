@@ -14,7 +14,31 @@ While there are plenty of deployment tools that try to do a lot, not everyone ne
 
 ## Installation
 
-Steer is still a pre-release
+Steer is still a pre-release software. I'm trying to manually test it in as many scenarios as possible and setting up an automated testing environment.
+
+### Download from the Source
+
+Open up the [latest release](https://github.com/fadion/steer/releases/latest) and download one of the archives corresponding to your operating system and architecture. If you're on a 64-bit macOS for example, you'll need "steer-macos-64bit.zip". Extract the archive, move it in a location under $PATH (or %PATH% on Windows) and you're good to go.
+ 
+### Updates
+
+Steer has self-updating capabilities, so you'll need to install it only once and then update just by running:
+
+```
+steer update
+```
+
+If there's a new version, Steer will download it and replace your existing binary.
+
+### Using the Code
+
+If you want to make a pull request or just edit the code for fun, you can build Steer as usual. It needs at least `go 1.8` with GOPATH configured and $GOPATH/bin in your path to run the executable.
+
+```
+go get github.com/fadion/steer
+go install
+steer version
+```
 
 ## Setup
 
