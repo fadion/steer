@@ -2,15 +2,13 @@
 
 A deployment tool that makes it as easy and hassle-free as it can be. No matter your skill level, it only requires a minute to setup, with no complicated configurations or special permissions.
 
-Steer relies on Git to keep track of what has changed in the project, relieving itself from the heavy burden of version control. Files are pushed on the server either via FTP or SFTP, supporting basically any host, from shared to dedicated or cloud. But it's not just a tool that reads the file tree and uploads. It supports multiple servers, deployment previews, versioning and quite some more.
+Steer relies on Git to keep track of what has changed in the project, relieving itself from the heavy burden of version control. Using the raw performance and concurrency of Go, it pushes files in parallel on either a FTP or SFTP server. But it's not just a tool that reads the file tree and uploads. It supports multiple servers, deployment previews, versioning and quite some more.
+
+While there are plenty of deployment tools that try to do a lot, not everyone needs all of their features. Teams of developers will obviously have a great setup, with jobs, hooks, commands and so on. The rest, freelancers, hobbyists or solo developers just want to get the job done and not worry about infrustructure.
 
 ## How it Works
 
-A config file is saved in the root of the local project that holds the configuration data: server address, credentials, paths, branch, etc. Steer reads the config, connects to the server and searches for a file named `.steer-revision`. It is that remote revision file that holds the latest deployment commit. When deploying, the list of changed files are retrieved using git, so the project you're working on needs to be a git repository.
-
-## But Why?
-
-While there are plenty of deployment tools that try to do a lot, not everyone needs all of their features. Teams of developers will obviously have a great setup, with jobs, hooks, commands and so on. The rest, freelancers, hobbyists or solo developers just want to get the job done and not worry about infrustructure. Steer doesn't try to do more than it should and with its simple approach, it lets the developer worry about code.
+A config file is saved in the root of the local project that holds the configuration data: server address, credentials, paths, branch, etc. Steer reads the config, connects to the server and searches for a file named `.steer-revision`. It is that remote revision file that holds the latest deployment commit. When deploying, the list of changed files are retrieved using git, uploading new or modifies files and deleting the removed ones.
 
 ## Installation
 
@@ -64,6 +62,7 @@ versions = false
 logger = false
 include = file.js, folder
 exclude = file.css, file.html
+maxclients = 3
 
 [staging]
 scheme = sftp
@@ -124,6 +123,18 @@ The `commit` and `fresh` options can be used alongside server arguments:
 
 ```
 steer deploy production -c=SOMEHASH
+```
+
+## Parallel Operations
+
+Doing a single operation synchronously would make deployment quite a slow process, especially when a lot of files are involved. Fortunately, Steer can upload and delete files in parallel on both FTP and SFTP, speeding up the process substantially. The number of concurrent operations varies from the server configuration, so you may start with a sensible number like 3 (the default) and increase it until you notice errors while deploying.
+
+The `maxclients` configuration option sets the maximum number of concurrent operations. Set to 1 for no parallelism.
+
+```
+[production]
+; ...
+maxclients = 5
 ```
 
 ## Preview
@@ -258,4 +269,4 @@ steer deploy -h
 
 Steer was developed by Fadion Dashi, a freelance web and mobile developer from Tirana.
 
-Most of the inspiration for this project comes from [PHPloy](https://github.com/banago/PHPloy), a deployment tool created by a dear friend, in which I've also been involved. I'm aiming feature parity and even added some of my own ideas.
+Most of the inspiration for this project comes from [PHPloy](https://github.com/banago/PHPloy), a deployment tool created by a dear friend, in which I've also been involved. I'm aiming to implement most of its features, but also have added some of my own. The main advantage of Steer right now is its performance, especially with parallel operations.
