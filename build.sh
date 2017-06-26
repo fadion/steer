@@ -30,7 +30,7 @@ build() {
         binary="$binary.exe"
     fi
 
-    env GOOS=${os} GOARCH=${arch} go build -v -o ${binary} ../main.go
+    env GOOS=${os} GOARCH=${arch} go build -v -o ${binary} ../steer.go
 
     if [ ${os} = linux ]; then
         tar czf "$release.tar.gz" "$binary"
