@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"path/filepath"
+	"sync"
+	remotepath "path"
 	"github.com/secsy/goftp"
 )
 
@@ -47,7 +48,7 @@ func (f *ftp) Upload(path, destination string) error {
 
 	defer file.Close()
 
-	if err = f.MkDir(filepath.Dir(destination)); err != nil {
+	if err = f.MkDir(remotepath.Dir(destination)); err != nil {
 		return err
 	}
 
@@ -86,20 +87,21 @@ func (f *ftp) Close() {
 
 // Append the basepath to path.
 func (f *ftp) makePath(path string) string {
-	return strings.TrimRight(f.basepath, "/") + "/" + strings.TrimLeft(path, "/")
+	return remotepath.Join(f.basepath, path)
 }
 
 // Create directories for a given path.
 func (f *ftp) createDirs(dir string) error {
 	components := strings.Split(dir, string(os.PathSeparator))
 	currentDir := strings.TrimRight(f.basepath, "/")
+	mutex := &sync.Mutex{}
 
 	for _, c := range components {
 		if c == "." || c == ".." {
 			continue
 		}
 
-		currentDir += "/" + c
+		currentDir = remotepath.Join(currentDir, c)
 
 		_, err := f.conn.Stat(currentDir)
 		if err != nil {

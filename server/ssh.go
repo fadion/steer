@@ -5,7 +5,7 @@ import (
 	"strings"
 	"path"
 	"os"
-	"path/filepath"
+	remotepath "path"
 	"bufio"
 	"io"
 	srv "github.com/pkg/sftp"
@@ -99,7 +99,7 @@ func (s *sftp) Upload(path, destination string) error {
 
 	defer file.Close()
 
-	if err = s.MkDir(filepath.Dir(destination)); err != nil {
+	if err = s.MkDir(remotepath.Dir(destination)); err != nil {
 		return err
 	}
 
@@ -160,7 +160,7 @@ func (s *sftp) Close() {
 
 // Append the basepath to path.
 func (s *sftp) makePath(path string) string {
-	return strings.TrimRight(s.basepath, "/") + "/" + strings.TrimLeft(path, "/")
+	return remotepath.Join(s.basepath, path)
 }
 
 // Create directories for a given path.
