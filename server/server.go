@@ -13,6 +13,7 @@ type Params struct {
 	Password   string
 	Privatekey string
 	Path       string
+	Maxclients int
 }
 
 // Initialise a connection with a driver.

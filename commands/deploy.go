@@ -78,31 +78,46 @@ func Deploy(ctx *cli.Context) error {
 		files = addIncludes(files, cfg.Include)
 		files = removeExcludes(files, cfg.Exclude)
 
+		// A channel with a buffer the size of the maximum
+		// number of clients read from the config.
+		sem := make(chan bool, cfg.Maxclients)
+
 		for _, file := range files {
-			switch file.Operation {
-			case git.ADDED, git.COPIED, git.MODIFIED, git.TYPE:
-				spin.Prefix = fmt.Sprintf("Uploading %s ", file.Name)
-				spin.Start()
+			sem <- true
 
-				err := conn.Upload(file.Name, versionpath+file.Name)
-				spin.Stop()
-				if err != nil {
-					color.Red("× %s couldn't be uploaded\n", file.Name)
-				} else {
-					color.Green("✓ %s was uploaded\n", file.Name)
-				}
-			case git.DELETED:
-				spin.Prefix = fmt.Sprintf("Deleting %s ", file.Name)
-				spin.Start()
+			go func(file git.File) {
+				switch file.Operation {
+				case git.ADDED, git.COPIED, git.MODIFIED, git.TYPE:
+					spin.Prefix = fmt.Sprintf("Uploading %s ", file.Name)
+					spin.Start()
 
-				err := conn.Delete(versionpath + file.Name)
-				spin.Stop()
-				if err != nil {
-					color.Red("× %s couldn't be deleted\n", file.Name)
-				} else {
-					color.Green("✓ %s was deleted\n", file.Name)
+					err := conn.Upload(file.Name, versionpath+file.Name)
+					spin.Stop()
+					if err != nil {
+						color.Red("× %s couldn't be uploaded\n", file.Name)
+					} else {
+						color.Green("✓ %s was uploaded\n", file.Name)
+					}
+				case git.DELETED:
+					spin.Prefix = fmt.Sprintf("Deleting %s ", file.Name)
+					spin.Start()
+
+					err := conn.Delete(versionpath + file.Name)
+					spin.Stop()
+					if err != nil {
+						color.Red("× %s couldn't be deleted\n", file.Name)
+					} else {
+						color.Green("✓ %s was deleted\n", file.Name)
+					}
 				}
-			}
+
+				<-sem
+			}(file)
+		}
+
+		// Wait for the last goroutines (buffer size) to finish.
+		for i := 0; i < cap(sem); i++ {
+			sem <- true
 		}
 
 		if len(files) == 0 {
@@ -125,18 +140,18 @@ func Deploy(ctx *cli.Context) error {
 			if isversioned {
 				color.Yellow("Project deployed successfully on: %s", strings.TrimRight(versionfolder, "/"))
 			} else {
-				spin.Prefix = "Writing remote revision file "
-				spin.Start()
-
-				remoteCfg := config.NewRemote(conn)
-				err := remoteCfg.Write(commit)
-				spin.Stop()
-
-				if err != nil {
-					color.Red("\nProject deployed, but remote revision couldn't be written. Try running 'steer sync'.")
-				} else {
-					color.Yellow("\nProject deployed successfully.")
-				}
+				//spin.Prefix = "Writing remote revision file "
+				//spin.Start()
+				//
+				//remoteCfg := config.NewRemote(conn)
+				//err := remoteCfg.Write(commit)
+				//spin.Stop()
+				//
+				//if err != nil {
+				//	color.Red("\nProject deployed, but remote revision couldn't be written. Try running 'steer sync'.")
+				//} else {
+				//	color.Yellow("\nProject deployed successfully.")
+				//}
 			}
 		}
 	})

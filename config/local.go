@@ -33,17 +33,19 @@ type SectionConfig struct {
 	Include    []string
 	Exclude    []string
 	Logger     bool
+	Maxclients int
 }
 
 // Default configuration.
 type localDefaults struct {
-	scheme   string
-	port     int
-	path     string
-	branch   string
-	versions bool
-	vfolder  string
-	logger   bool
+	scheme     string
+	port       int
+	path       string
+	branch     string
+	versions   bool
+	vfolder    string
+	logger     bool
+	maxclients int
 }
 
 // Initialise a new local config.
@@ -51,13 +53,14 @@ func NewLocal() *LocalConfig {
 	return &LocalConfig{
 		file: ".steer",
 		defaults: localDefaults{
-			scheme:   "ftp",
-			port:     21,
-			path:     "/",
-			branch:   "master",
-			versions: false,
-			vfolder:  "versions",
-			logger:   false,
+			scheme:     "ftp",
+			port:       21,
+			path:       "/",
+			branch:     "master",
+			versions:   false,
+			vfolder:    "versions",
+			logger:     false,
+			maxclients: 3,
 		},
 	}
 }
@@ -81,6 +84,7 @@ func (c *LocalConfig) Create() error {
 	defer f.Close()
 
 	_, err = f.WriteString(`[production]
+scheme = ftp
 host = ftp.example.com
 port = 21
 username = user
@@ -136,6 +140,7 @@ func (c *LocalConfig) Read() (*ServerConfig, error) {
 			Include:    sec.Key("include").Strings(","),
 			Exclude:    sec.Key("exclude").Strings(","),
 			Logger:     sec.Key("logger").MustBool(c.defaults.logger),
+			Maxclients: sec.Key("maxclients").MustInt(c.defaults.maxclients),
 		})
 	}
 

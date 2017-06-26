@@ -1,5 +1,5 @@
-hash: 0e5c13449502ac74e80c31f9c9532d69c7a26b9b5145d5a15182b03a812df1ea
-updated: 2017-06-20T00:08:26.041686178+02:00
+hash: 44168215aebc9b8c0657d506ea44a86aaeb2441506f3d6cb6d69ac1fc011e6b1
+updated: 2017-06-26T19:02:44.632424234+02:00
 imports:
 - name: github.com/briandowns/spinner
   version: 48dbb65d7bd5c74ab50d53d04c949f20e3d14944
@@ -23,6 +23,8 @@ imports:
   version: c605e284fe17294bda444b34710735b29d1a9d90
 - name: github.com/pkg/sftp
   version: 516f73358825b579ad5ddaf6abb80346bd96e54c
+- name: github.com/secsy/goftp
+  version: 848bd83f73185175b43f6093f1639af3b463b889
 - name: github.com/urfave/cli
   version: 0bdeddeeb0f650497d603c4ad7b20cfe685682f6
 - name: golang.org/x/crypto

@@ -105,6 +105,7 @@ func connectToServer(cfg config.SectionConfig) (*server.Connection, error) {
 		Password:   cfg.Password,
 		Privatekey: cfg.Privatekey,
 		Path:       cfg.Path,
+		Maxclients: cfg.Maxclients,
 	}
 
 	var driver server.Driver
