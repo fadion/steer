@@ -82,32 +82,29 @@ func Deploy(ctx *cli.Context) error {
 		// number of clients read from the config.
 		sem := make(chan bool, cfg.Maxclients)
 
+		spin.Prefix = "Starting deploy "
+		spin.Start()
+
 		for _, file := range files {
 			sem <- true
 
 			go func(file git.File) {
 				switch file.Operation {
 				case git.ADDED, git.COPIED, git.MODIFIED, git.TYPE:
-					spin.Prefix = fmt.Sprintf("Uploading %s ", file.Name)
-					spin.Start()
-
 					err := conn.Upload(file.Name, versionpath+file.Name)
 					spin.Stop()
 					if err != nil {
-						color.Red("× %s couldn't be uploaded\n", file.Name)
+						color.Red("× %s couldn't be uploaded", file.Name)
 					} else {
-						color.Green("✓ %s was uploaded\n", file.Name)
+						color.Green("✓ %s was uploaded", file.Name)
 					}
 				case git.DELETED:
-					spin.Prefix = fmt.Sprintf("Deleting %s ", file.Name)
-					spin.Start()
-
 					err := conn.Delete(versionpath + file.Name)
 					spin.Stop()
 					if err != nil {
-						color.Red("× %s couldn't be deleted\n", file.Name)
+						color.Red("× %s couldn't be deleted", file.Name)
 					} else {
-						color.Green("✓ %s was deleted\n", file.Name)
+						color.Green("✓ %s was deleted", file.Name)
 					}
 				}
 
@@ -140,18 +137,18 @@ func Deploy(ctx *cli.Context) error {
 			if isversioned {
 				color.Yellow("Project deployed successfully on: %s", strings.TrimRight(versionfolder, "/"))
 			} else {
-				//spin.Prefix = "Writing remote revision file "
-				//spin.Start()
-				//
-				//remoteCfg := config.NewRemote(conn)
-				//err := remoteCfg.Write(commit)
-				//spin.Stop()
-				//
-				//if err != nil {
-				//	color.Red("\nProject deployed, but remote revision couldn't be written. Try running 'steer sync'.")
-				//} else {
-				//	color.Yellow("\nProject deployed successfully.")
-				//}
+				spin.Prefix = "Writing remote revision file "
+				spin.Start()
+
+				remoteCfg := config.NewRemote(conn)
+				err := remoteCfg.Write(commit)
+				spin.Stop()
+
+				if err != nil {
+					color.Red("\nProject deployed, but remote revision couldn't be written. Try running 'steer sync'.")
+				} else {
+					color.Yellow("\nProject deployed successfully.")
+				}
 			}
 		}
 	})
