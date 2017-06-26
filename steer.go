@@ -15,7 +15,7 @@ func main() {
 		Name:  "Fadion Dashi",
 		Email: "jonidashi@gmail.com",
 	}}
-	app.Version = "0.3.0"
+	app.Version = "0.3.1"
 
 	app.Commands = []cli.Command{
 		{
