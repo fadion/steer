@@ -20,8 +20,6 @@ func Deploy(ctx *cli.Context) error {
 	fresh := ctx.Bool("fresh")
 	all := ctx.Bool("all")
 	commit := ctx.String("commit")
-	atomic := ctx.Bool("atomic")
-	nonatomic := ctx.Bool("non-atomic")
 	message := ctx.String("message")
 	spin := spinner.New(spinner.CharSets[21], 100*time.Millisecond)
 
@@ -35,10 +33,7 @@ func Deploy(ctx *cli.Context) error {
 		var atomicpath string
 		var releasefolder string
 
-		isatomic := atomic || cfg.Atomic
-		if nonatomic {
-			isatomic = false
-		}
+		isatomic := cfg.Atomic
 
 		// Read the remote revision if it's not a fresh deploy or
 		// an atomic one.

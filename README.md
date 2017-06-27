@@ -176,13 +176,14 @@ steer sync --all
 When high availability of your site is critical, you can use atomic deployments for virtually no down time during updates. Steer will no longer update files in the base path, but instead push the whole project inside a `releases` directory. To get an idea:
 
 ```
+/current
 /releases
    /111111111
    /222222222
    /333333333
 ```
 
-Each deployment will create a new directory to ensure uniqueness, holding every file of the project. The latest directory can be manually symlinked to your web root once it's uploaded, transitioning to the updated release without any delay. In the future, I plan to automatically create the symlink in SFTP connections and generally make atomic deployments much more feature rich.
+Each deployment will create a new directory to ensure uniqueness, holding every file of the project. The latest directory can be manually symlinked to your web root once it's uploaded (ex: `/current`), transitioning to the updated release without any delay. In the future, I plan to automatically create the symlink in SFTP connections and generally make atomic deployments much more feature rich.
 
 To activate atomic deployments, you have to enable an `atomic` configuration option. The default directory is `releases` and that should be a good name for most people. However, if for some reason you want to change it, there's also the `releasedir` option. It must be set relative to the `path` option and must be already created on the server.
 
@@ -191,20 +192,6 @@ To activate atomic deployments, you have to enable an `atomic` configuration opt
 ; ...
 atomic = true
 releasedir = myreleases
-```
-
-Atomic deployments can be enabled or disabled interactively on the command line too. These help in switching the type of deploy without touching the configuration.
-
-Enable atomic deployments:
-
-```
-steer deploy --atomic
-```
-
-Disable atomic deployments:
-
-```
-steer deploy --non-atomic
 ```
 
 ## Logging

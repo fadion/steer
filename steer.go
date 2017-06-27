@@ -56,14 +56,6 @@ func main() {
 					Name:  "all",
 					Usage: "Deploy to all servers",
 				},
-				cli.BoolFlag{
-					Name:  "atomic",
-					Usage: "Enable atomic deployments",
-				},
-				cli.BoolFlag{
-					Name:  "non-atomic",
-					Usage: "Disable atomic deployments",
-				},
 				cli.StringFlag{
 					Name:  "commit, c",
 					Usage: "Changes from `COMMIT`",
