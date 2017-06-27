@@ -28,8 +28,8 @@ type SectionConfig struct {
 	Privatekey string
 	Path       string
 	Branch     string
-	Versions   bool
-	Vfolder    string
+	Atomic     bool
+	Releasedir string
 	Include    []string
 	Exclude    []string
 	Logger     bool
@@ -42,8 +42,8 @@ type localDefaults struct {
 	port       int
 	path       string
 	branch     string
-	versions   bool
-	vfolder    string
+	atomic     bool
+	releasedir string
 	logger     bool
 	maxclients int
 }
@@ -57,8 +57,8 @@ func NewLocal() *LocalConfig {
 			port:       21,
 			path:       "/",
 			branch:     "master",
-			versions:   false,
-			vfolder:    "versions",
+			atomic:     false,
+			releasedir: "releases",
 			logger:     false,
 			maxclients: 3,
 		},
@@ -135,8 +135,8 @@ func (c *LocalConfig) Read() (*ServerConfig, error) {
 			Privatekey: sec.Key("privatekey").MustString(""),
 			Path:       sec.Key("path").MustString(c.defaults.path),
 			Branch:     sec.Key("branch").MustString(c.defaults.branch),
-			Versions:   sec.Key("versions").MustBool(c.defaults.versions),
-			Vfolder:    sec.Key("vfolder").MustString(c.defaults.vfolder),
+			Atomic:     sec.Key("atomic").MustBool(c.defaults.atomic),
+			Releasedir: sec.Key("releasedir").MustString(c.defaults.releasedir),
 			Include:    sec.Key("include").Strings(","),
 			Exclude:    sec.Key("exclude").Strings(","),
 			Logger:     sec.Key("logger").MustBool(c.defaults.logger),

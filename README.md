@@ -1,6 +1,6 @@
 # Steer
 
-Steer is a deployment tool that relies on Git to keep track of what has changed in the project. Using the raw performance and concurrency of Go, it pushes files in parallel on either a FTP or SFTP server. But it's not just a tool that reads the file tree and uploads. It supports multiple servers, deployment previews, versioning and quite some more.
+Steer is a deployment tool that relies on Git to keep track of what has changed in the project. Using the raw performance and concurrency of Go, it pushes files in parallel on either a FTP or SFTP server. But it's not just a tool that reads the file tree and uploads. It supports multiple servers, previews, atomic deploys and quite some more.
 
 ## Table of Contents
 
@@ -10,7 +10,7 @@ Steer is a deployment tool that relies on Git to keep track of what has changed 
 - [Parallel Operations](#parallel-operations)
 - [Preview](#preview)
 - [Sync](#sync)
-- [Versions](#versions)
+- [Atomic Deployments](#atomic-deployments)
 - [Logging](#logging)
 - [File Includes and Excludes](#file-includes-and-excludes)
 - [Getting Help](#getting-help)
@@ -64,7 +64,7 @@ password = secret
 privatekey = /path/to/key
 path = /
 branch = master
-versions = false
+atomic = false
 logger = false
 include = file.js, folder
 exclude = file.css, file.html
@@ -171,42 +171,40 @@ With the command executed, the remote revision will hold the latest commit and b
 steer sync --all
 ```
 
-## Versions
+## Atomic Deployments
 
-Steer can behave in a way vaguely similar to deployment tools like Capistrano or Rocketeer, albeit much more lightweight. When versions is activated, steer will no longer deploy to the base path as usual, but instead inside a `versions` directory. Every deploy will create a new directory that holds the whole project. Example:
+When high availability of your site is critical, you can use atomic deployments for virtually no down time during updates. Steer will no longer update files in the base path, but instead push the whole project inside a `releases` directory. To get an idea:
 
 ```
-/versions
-   /version-1111
-   /version-2222
-   /version-3333
+/releases
+   /111111111
+   /222222222
+   /333333333
 ```
 
-Obviously the version folders will have a timestamp appended, ensuring their uniqueness. Once you've uploaded a new version, the general practice is to symlink that version with the project. That way, you ensure zero downtime and can test new versions in a production environment.
+Each deployment will create a new directory to ensure uniqueness, holding every file of the project. The latest directory can be manually symlinked to your web root once it's uploaded, transitioning to the updated release without any delay. In the future, I plan to automatically create the symlink in SFTP connections and generally make atomic deployments much more feature rich.
 
-To activate versions, you have to enable a `versions` configuration option. The default directory is `versions` and that should be a good name for most people. However, if for some reason you want to change it, there's also the `vfolder` option. It must be set relative to the `path` option. Make sure to manually create the `versions` directory on the server, otherwise it will fail.
+To activate atomic deployments, you have to enable an `atomic` configuration option. The default directory is `releases` and that should be a good name for most people. However, if for some reason you want to change it, there's also the `releasedir` option. It must be set relative to the `path` option and must be already created on the server.
 
 ```
 [production]
 ; ...
-versions = true
-vfolder = versiones
+atomic = true
+releasedir = myreleases
 ```
 
-Keep in mind that versions will upload the whole project, disregarding revisions, so it will take a while depending on the amount of files. Think before going on the versions route if that's what you want and if the benefits outweigh the simplicity of regular deployments.
+Atomic deployments can be enabled or disabled interactively on the command line too. These help in switching the type of deploy without touching the configuration.
 
-Versions can be enabled or disabled interactively on the command line. These help in switching the type of deploy without touching the configuration.
-
-Enable versions:
+Enable atomic deployments:
 
 ```
-steer deploy --verions
+steer deploy --atomic
 ```
 
-Disable versions:
+Disable atomic deployments:
 
 ```
-steer deploy --no-verions
+steer deploy --non-atomic
 ```
 
 ## Logging
@@ -216,8 +214,7 @@ A simple logger is available that writes on the server a `.steer-log` with infor
 ```
 [production]
 ; ...
-versions = true
-vfolder = versiones
+logger = true
 ```
 
 Deployments can have custom messages attached to the log:

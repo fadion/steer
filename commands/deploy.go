@@ -20,8 +20,8 @@ func Deploy(ctx *cli.Context) error {
 	fresh := ctx.Bool("fresh")
 	all := ctx.Bool("all")
 	commit := ctx.String("commit")
-	versions := ctx.Bool("versions")
-	noversions := ctx.Bool("no-versions")
+	atomic := ctx.Bool("atomic")
+	nonatomic := ctx.Bool("non-atomic")
 	message := ctx.String("message")
 	spin := spinner.New(spinner.CharSets[21], 100*time.Millisecond)
 
@@ -32,17 +32,17 @@ func Deploy(ctx *cli.Context) error {
 	eachServer(bootstrap(all, servers), func(cfg config.SectionConfig, conn *server.Connection) {
 		var rev string
 		var err error
-		var versionpath string
-		var versionfolder string
+		var atomicpath string
+		var releasefolder string
 
-		isversioned := versions || cfg.Versions
-		if noversions {
-			isversioned = false
+		isatomic := atomic || cfg.Atomic
+		if nonatomic {
+			isatomic = false
 		}
 
 		// Read the remote revision if it's not a fresh deploy or
-		// a versioned one.
-		if !fresh && !isversioned {
+		// an atomic one.
+		if !fresh && !isatomic {
 			spin.Prefix = "Reading remote revision file "
 			spin.Start()
 			remotecfg := config.NewRemote(conn)
@@ -55,12 +55,12 @@ func Deploy(ctx *cli.Context) error {
 			}
 		}
 
-		// Create the versions folder either when a config or cli
+		// Create the atomic folder either when a config or cli
 		// flag are set.
-		if isversioned {
-			versionfolder = "/version-" + fmt.Sprintf("%d", time.Now().Unix()) + "/"
-			versionpath = strings.Trim(cfg.Vfolder, "/") + versionfolder
-			color.Yellow("Starting a versioned deployment on: %s", strings.TrimRight(versionfolder, "/"))
+		if isatomic {
+			releasefolder = "/" + fmt.Sprintf("%d", time.Now().Unix()) + "/"
+			atomicpath = strings.Trim(cfg.Releasedir, "/") + releasefolder
+			color.Yellow("Starting an atomic deployment on: %s", strings.TrimRight(releasefolder, "/"))
 			fmt.Println()
 		}
 
@@ -91,7 +91,7 @@ func Deploy(ctx *cli.Context) error {
 			go func(file git.File) {
 				switch file.Operation {
 				case git.ADDED, git.COPIED, git.MODIFIED, git.TYPE:
-					err := conn.Upload(file.Name, versionpath+file.Name)
+					err := conn.Upload(file.Name, atomicpath+file.Name)
 					spin.Stop()
 					if err != nil {
 						color.Red("× %s couldn't be uploaded", file.Name)
@@ -99,7 +99,7 @@ func Deploy(ctx *cli.Context) error {
 						color.Green("✓ %s was uploaded", file.Name)
 					}
 				case git.DELETED:
-					err := conn.Delete(versionpath + file.Name)
+					err := conn.Delete(atomicpath + file.Name)
 					spin.Stop()
 					if err != nil {
 						color.Red("× %s couldn't be deleted", file.Name)
@@ -134,8 +134,8 @@ func Deploy(ctx *cli.Context) error {
 				}
 			}
 
-			if isversioned {
-				color.Yellow("Project deployed successfully on: %s", strings.TrimRight(versionfolder, "/"))
+			if isatomic {
+				color.Yellow("Project deployed successfully on: %s", strings.TrimRight(releasefolder, "/"))
 			} else {
 				spin.Prefix = "Writing remote revision file "
 				spin.Start()
