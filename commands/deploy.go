@@ -126,7 +126,7 @@ func Deploy(ctx *cli.Context) error {
 				spin.Start()
 
 				log := logger.New(conn)
-				err = log.Write(len(files), cfg.Branch, commit, message)
+				_, err = log.Write(len(files), cfg.Branch, commit, message)
 				spin.Stop()
 
 				if err != nil {

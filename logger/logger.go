@@ -32,7 +32,7 @@ func (l *Log) Read() (string, error) {
 }
 
 // Write the log file in the server.
-func (l *Log) Write(nrfiles int, branch, commit, message string) error {
+func (l *Log) Write(nrfiles int, branch, commit, message string) (string, error) {
 	now := time.Now().Format("2006-01-02 03:04:05 -0700")
 	contents := fmt.Sprintf("%s | Commit: %s | Branch: %s | Changed Files: %d", now, commit, branch, nrfiles)
 	if message != "" {
@@ -51,12 +51,12 @@ func (l *Log) Write(nrfiles int, branch, commit, message string) error {
 
 	f, err := os.Create(l.file)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	_, err = f.WriteString(remote)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	defer f.Close()
@@ -66,10 +66,10 @@ func (l *Log) Write(nrfiles int, branch, commit, message string) error {
 
 	err = l.conn.Upload(l.file, l.file)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return contents, nil
 }
 
 // Parse a line from the log.
@@ -93,7 +93,7 @@ func (l *Log) ParseLine(line string) string {
 	return output
 }
 
-// Write the log file in the server.
+// Delete the log file from the server.
 func (l *Log) Clear() bool {
 	if err := l.conn.Delete(l.file); err != nil {
 		return false
