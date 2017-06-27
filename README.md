@@ -1,14 +1,20 @@
 # Steer
 
-A deployment tool that makes it as easy and hassle-free as it can be. No matter your skill level, it only requires a minute to setup, with no complicated configurations or special permissions.
+Steer is a deployment tool that relies on Git to keep track of what has changed in the project. Using the raw performance and concurrency of Go, it pushes files in parallel on either a FTP or SFTP server. But it's not just a tool that reads the file tree and uploads. It supports multiple servers, deployment previews, versioning and quite some more.
 
-Steer relies on Git to keep track of what has changed in the project, relieving itself from the heavy burden of version control. Using the raw performance and concurrency of Go, it pushes files in parallel on either a FTP or SFTP server. But it's not just a tool that reads the file tree and uploads. It supports multiple servers, deployment previews, versioning and quite some more.
+## Table of Contents
 
-While there are plenty of deployment tools that try to do a lot, not everyone needs all of their features. Teams of developers will obviously have a great setup, with jobs, hooks, commands and so on. The rest, freelancers, hobbyists or solo developers just want to get the job done and not worry about infrustructure.
-
-## How it Works
-
-A config file is saved in the root of the local project that holds the configuration data: server address, credentials, paths, branch, etc. Steer reads the config, connects to the server and searches for a file named `.steer-revision`. It is that remote revision file that holds the latest deployment commit. When deploying, the list of changed files are retrieved using git, uploading new or modifies files and deleting the removed ones.
+- [Installation](#installation)
+- [Setup](#setup)
+- [Deploy](#deploy)
+- [Parallel Operations](#parallel-operations)
+- [Preview](#preview)
+- [Sync](#sync)
+- [Versions](#versions)
+- [Logging](#logging)
+- [File Includes and Excludes](#file-includes-and-excludes)
+- [Getting Help](#getting-help)
+- [Credits](#credits)
 
 ## Installation
 
