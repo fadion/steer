@@ -33,6 +33,10 @@ func Deploy(ctx *cli.Context) error {
 		var atomicpath string
 		var releasefolder string
 
+		if deployInProgress(conn) && !askForConfirmation("A deploy is already in progress and may cause conflicts. Are you sure you want to continue?") {
+			return
+		}
+
 		isatomic := cfg.Atomic
 
 		// Read the remote revision if it's not a fresh deploy or
