@@ -102,6 +102,17 @@ func main() {
 			Action: commands.Log,
 		},
 		{
+			Name:  "status",
+			Usage: "Show server status",
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "all",
+					Usage: "Status for all servers",
+				},
+			},
+			Action: commands.Status,
+		},
+		{
 			Name:  "update",
 			Usage: "Update steer to the latest version",
 			Action: commands.Update,

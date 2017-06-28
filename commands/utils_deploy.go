@@ -44,3 +44,12 @@ func createProgressIndicator(conn *server.Connection) {
 func deleteProgressIndicator(conn *server.Connection) {
 	conn.Delete(progressindicator)
 }
+
+func deployInProgress(conn *server.Connection) bool {
+	_, err := conn.Read(progressindicator)
+	if err != nil {
+		return false
+	}
+
+	return true
+}

@@ -3,7 +3,6 @@ package commands
 import (
 	"fmt"
 	"time"
-	"strings"
 	"github.com/urfave/cli"
 	"github.com/fatih/color"
 	"github.com/briandowns/spinner"
@@ -13,10 +12,9 @@ import (
 )
 
 // Preview file changes.
-func Preview(ctx *cli.Context) error {
+func Status(ctx *cli.Context) error {
 	servers := ctx.Args()
 	all := ctx.Bool("all")
-	commit := ctx.String("commit")
 	spin := spinner.New(spinner.CharSets[21], 100*time.Millisecond)
 
 	eachServer(bootstrap(all, servers), func(cfg config.SectionConfig, conn *server.Connection) {
@@ -40,31 +38,16 @@ func Preview(ctx *cli.Context) error {
 			return
 		}
 
-		files := vcs.Changes(rev, commit)
+		files := vcs.Changes(rev, "")
 		files = addIncludes(files, cfg.Include)
 		files = removeExcludes(files, cfg.Exclude)
 
-		for _, file := range files {
-			switch file.Operation {
-			case git.ADDED, git.COPIED:
-				color.Set(color.FgGreen)
-			case git.MODIFIED, git.RENAMED, git.TYPE:
-				color.Set(color.FgBlue)
-			case git.DELETED:
-				color.Set(color.FgRed)
-			case git.UNKNOWN:
-				color.Set(color.FgBlack)
-			default:
-				color.Set(color.FgWhite)
-			}
+		color.White("Remote commit: %s", rev)
+		color.White("Local HEAD: %s", vcs.RefHead())
+		color.Green("%d file(s) changed since last commit", len(files))
 
-			fmt.Printf("[%s] %s\n", strings.ToUpper(file.Operation[0:3]), file.Name)
-
-			color.Unset()
-		}
-
-		if len(files) == 0 {
-			color.Yellow("\nNothing changed since the last deploy.")
+		if deployInProgress(conn) {
+			color.Red("A deployment is already in progress.")
 		}
 	})
 

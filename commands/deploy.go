@@ -64,11 +64,6 @@ func Deploy(ctx *cli.Context) error {
 			return
 		}
 
-		// An empty commit assumes it's HEAD.
-		if commit == "" {
-			commit = vcs.RefHead()
-		}
-
 		files := vcs.Changes(rev, commit)
 		files = addIncludes(files, cfg.Include)
 		files = removeExcludes(files, cfg.Exclude)
