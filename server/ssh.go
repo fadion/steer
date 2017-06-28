@@ -5,12 +5,12 @@ import (
 	"strings"
 	"path"
 	"os"
-	remotepath "path"
 	"bufio"
 	"io"
+	"bytes"
+	remotepath "path"
 	srv "github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
-	"bytes"
 )
 
 type sftp struct {
@@ -55,36 +55,6 @@ func ConnectSsh(cfg Params) (*sftp, error) {
 		conn:     conn,
 		basepath: cfg.Path,
 	}, nil
-}
-
-// Parse private key.
-func parsePrivateKey(file string) (ssh.AuthMethod, error) {
-	f, err := os.Open(file)
-	if err != nil {
-		return nil, err
-	}
-
-	defer f.Close()
-
-	buffer := make([]byte, 5*1024)
-	read := 0
-	for {
-		read, err = f.Read(buffer)
-		if err != nil {
-			if err == io.EOF {
-				break
-			} else {
-				return nil, err
-			}
-		}
-	}
-
-	key, err := ssh.ParsePrivateKey(buffer[0:read])
-	if err != nil {
-		return nil, err
-	}
-
-	return ssh.PublicKeys(key), nil
 }
 
 // Create directory.
@@ -216,8 +186,11 @@ func (s *sftp) makePath(path string) string {
 func (s *sftp) createDirs(dir string) error {
 	var parents string
 	var err error
-
 	ssh_fx_failure := uint32(4)
+
+	if directoryAlreadyCreated(dir) {
+		return nil
+	}
 
 	for _, name := range strings.Split(dir, string(os.PathSeparator)) {
 		parents = path.Join(parents, name)
@@ -234,6 +207,7 @@ func (s *sftp) createDirs(dir string) error {
 			}
 		}
 		if err != nil {
+			addToCreatedDirs(parents)
 			break
 		}
 	}

@@ -16,8 +16,6 @@ type ftp struct {
 	mutex    *sync.Mutex
 }
 
-var createdDirs []string
-
 // Connect to the FTP server.
 func ConnectFtp(cfg Params) (*ftp, error) {
 	conn, err := goftp.DialConfig(goftp.Config{
@@ -30,9 +28,9 @@ func ConnectFtp(cfg Params) (*ftp, error) {
 	}
 
 	return &ftp{
-		conn: conn,
+		conn:     conn,
 		basepath: cfg.Path,
-		mutex: &sync.Mutex{},
+		mutex:    &sync.Mutex{},
 	}, nil
 }
 
@@ -107,7 +105,7 @@ func (f *ftp) createDirs(dir string) error {
 	components := strings.Split(dir, string(os.PathSeparator))
 	currentDir := strings.TrimRight(f.basepath, "/")
 
-	if f.directoryAlreadyCreated(f.makePath(dir)) {
+	if directoryAlreadyCreated(f.makePath(dir)) {
 		return nil
 	}
 
@@ -127,32 +125,9 @@ func (f *ftp) createDirs(dir string) error {
 				return err
 			}
 
-			f.addToCreatedDirs(currentDir)
+			addToCreatedDirs(currentDir)
 		}
 	}
 
 	return nil
-}
-
-// Check if a directory was already created.
-func (f *ftp) directoryAlreadyCreated(dir string) bool {
-	for _, k := range createdDirs {
-		if dir == k {
-			return true
-		}
-	}
-
-	return false
-}
-
-// Add a directory to the list of created directories if
-// it wasn't added before.
-func (f *ftp) addToCreatedDirs(dir string) {
-	for _, k := range createdDirs {
-		if dir == k {
-			return
-		}
-	}
-
-	createdDirs = append(createdDirs, dir)
 }
