@@ -6,7 +6,10 @@ import (
 	"github.com/fatih/color"
 	"github.com/briandowns/spinner"
 	"github.com/fadion/steer/server"
+	"os"
 )
+
+var progressindicator = ".steer-process"
 
 func executeCommands(commands []string, conn *server.Connection) {
 	spin := spinner.New(spinner.CharSets[21], 100*time.Millisecond)
@@ -24,4 +27,20 @@ func executeCommands(commands []string, conn *server.Connection) {
 
 		color.Green("'%s' executed successfully.", cmd)
 	}
+}
+
+func createProgressIndicator(conn *server.Connection) {
+	f, err := os.Create(progressindicator)
+	if err != nil {
+		return
+	}
+
+	defer f.Close()
+	defer os.Remove(progressindicator)
+
+	conn.Upload(progressindicator, progressindicator)
+}
+
+func deleteProgressIndicator(conn *server.Connection) {
+	conn.Delete(progressindicator)
 }

@@ -152,7 +152,7 @@ func (s *sftp) Read(path string) (string, error) {
 
 // Delete a file.
 func (s *sftp) Delete(path string) error {
-	if err := s.client.Remove(path); err != nil {
+	if err := s.client.Remove(s.makePath(path)); err != nil {
 		return err
 	}
 

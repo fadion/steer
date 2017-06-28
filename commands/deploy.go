@@ -73,6 +73,10 @@ func Deploy(ctx *cli.Context) error {
 		files = addIncludes(files, cfg.Include)
 		files = removeExcludes(files, cfg.Exclude)
 
+		// Write a temp file to indicate deployment progress.
+		go func() { createProgressIndicator(conn) }()
+		defer deleteProgressIndicator(conn)
+
 		// Predeploy commands.
 		if len(cfg.Predeploy) > 0 {
 			color.Yellow("Executing pre deployment commands:")
