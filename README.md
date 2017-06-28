@@ -9,6 +9,7 @@ Steer is a deployment tool that relies on Git to keep track of what has changed 
 - [Deploy](#deploy)
 - [Parallel Operations](#parallel-operations)
 - [Preview](#preview)
+- [Status](#status)
 - [Sync](#sync)
 - [Atomic Deployments](#atomic-deployments)
 - [Logging](#logging)
@@ -159,6 +160,16 @@ As with deploys, you can pass a list of servers as arguments, and the `--all` an
 ```
 steer preview staging -c=SOMEHASH
 ```
+
+## Status
+
+The status command will retrieve the current revision commit and the number of files changed since the latest deployment. It also warns if there's an active deployment process, especially useful when working in a team.
+
+```
+steer status
+```
+
+You can also pass a list of servers as arguments, the `--all` and `--commit` options.
 
 ## Sync
 
