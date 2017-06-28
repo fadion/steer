@@ -50,8 +50,7 @@ func Deploy(ctx *cli.Context) error {
 			}
 		}
 
-		// Create the atomic folder either when a config or cli
-		// flag are set.
+		// Create the atomic folder when the config option is set.
 		if isatomic {
 			releasefolder = "/" + fmt.Sprintf("%d", time.Now().Unix()) + "/"
 			atomicpath = strings.Trim(cfg.Releasedir, "/") + releasefolder
@@ -65,6 +64,7 @@ func Deploy(ctx *cli.Context) error {
 			return
 		}
 
+		// An empty commit assumes it's HEAD.
 		if commit == "" {
 			commit = vcs.RefHead()
 		}
@@ -72,6 +72,15 @@ func Deploy(ctx *cli.Context) error {
 		files := vcs.Changes(rev, commit)
 		files = addIncludes(files, cfg.Include)
 		files = removeExcludes(files, cfg.Exclude)
+
+		// Predeploy commands.
+		if len(cfg.Predeploy) > 0 {
+			color.Yellow("Executing pre deployment commands:")
+			executeCommands(cfg.Predeploy, conn)
+			if len(files) > 0 {
+				fmt.Println()
+			}
+		}
 
 		// A channel with a buffer the size of the maximum
 		// number of clients read from the config.
@@ -112,8 +121,17 @@ func Deploy(ctx *cli.Context) error {
 			sem <- true
 		}
 
+		spin.Stop()
+
+		// Postdeploy commands.
+		if len(cfg.Postdeploy) > 0 {
+			fmt.Println()
+			color.Yellow("Executing post deployment commands:")
+			executeCommands(cfg.Postdeploy, conn)
+		}
+
 		if len(files) == 0 {
-			color.Yellow("Nothing changed since the last deploy.")
+			color.Yellow("\nNothing changed since the last deploy.")
 		} else {
 			// Write to the log if it's active in the config.
 			if cfg.Logger {
@@ -130,7 +148,7 @@ func Deploy(ctx *cli.Context) error {
 			}
 
 			if isatomic {
-				color.Yellow("Project deployed successfully on: %s", strings.TrimRight(releasefolder, "/"))
+				color.Yellow("\nProject deployed successfully on: %s", strings.TrimRight(releasefolder, "/"))
 			} else {
 				spin.Prefix = "Writing remote revision file "
 				spin.Start()

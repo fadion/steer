@@ -12,6 +12,7 @@ Steer is a deployment tool that relies on Git to keep track of what has changed 
 - [Sync](#sync)
 - [Atomic Deployments](#atomic-deployments)
 - [Logging](#logging)
+- [Pre and Post Deployment Commands](#pre-and-post-deployment-commands)
 - [File Includes and Excludes](#file-includes-and-excludes)
 - [Getting Help](#getting-help)
 - [Credits](#credits)
@@ -69,6 +70,8 @@ logger = false
 include = file.js, folder
 exclude = file.css, file.html
 maxclients = 3
+predeploy = rm -rf cache
+postdeploy = npm update, gulp
 
 [staging]
 scheme = sftp
@@ -227,6 +230,21 @@ Finally, you can even delete the log file completely by typing:
 ```
 steer log --clear
 ```
+
+## Pre and Post Deployment Commands
+
+Often it is useful to run a shell command before or after deployment. You may need to clear a cache, update some dependencies, compile assets or whatever your case is. Steer allows to run arbitrary commands either pre or post deployment over SFTP. Keep in mind that commands can't be run via FTP.
+
+To execute commands, add one or more in the `predeploy` or `postdeploy` configuration option, separated by comma. For example:
+
+```
+[production]
+;...
+predeploy = rm -rf cache, touch nicefile.html
+postdeploy = npm update, gulp
+```
+
+Commands are blocking, meaning that Steer will wait for them to finish before moving on to the next operation. Currently they don't produce output, but as it's trivial to add, if enough people need it, I may implement a configurable output in the future.
 
 ## File Includes and Excludes
 

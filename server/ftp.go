@@ -87,6 +87,11 @@ func (f *ftp) Delete(path string) error {
 	return nil
 }
 
+// Execute a command on the server.
+func (f *ftp) Exec(command string) (string, error) {
+	return "", fmt.Errorf("FTP doesn't support commands")
+}
+
 // Close connection.
 func (f *ftp) Close() {
 	f.conn.Close()

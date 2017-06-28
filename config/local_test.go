@@ -76,6 +76,8 @@ func TestLocalConfigRead(t *testing.T) {
 		Exclude:    []string{},
 		Logger:     false,
 		Maxclients: 3,
+		Predeploy:  []string{},
+		Postdeploy: []string{},
 	}
 
 	if !reflect.DeepEqual(actual, expected) {

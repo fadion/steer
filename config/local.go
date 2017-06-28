@@ -34,6 +34,8 @@ type SectionConfig struct {
 	Exclude    []string
 	Logger     bool
 	Maxclients int
+	Predeploy  []string
+	Postdeploy []string
 }
 
 // Default configuration.
@@ -141,6 +143,8 @@ func (c *LocalConfig) Read() (*ServerConfig, error) {
 			Exclude:    sec.Key("exclude").Strings(","),
 			Logger:     sec.Key("logger").MustBool(c.defaults.logger),
 			Maxclients: sec.Key("maxclients").MustInt(c.defaults.maxclients),
+			Predeploy:  sec.Key("predeploy").Strings(","),
+			Postdeploy: sec.Key("postdeploy").Strings(","),
 		})
 	}
 

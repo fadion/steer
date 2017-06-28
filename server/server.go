@@ -58,6 +58,11 @@ func (c *Connection) Delete(path string) error {
 	return nil
 }
 
+// Execute a command on the server.
+func (c *Connection) Exec(command string) (string, error) {
+	return c.Driver.Exec(command)
+}
+
 // Close connection.
 func (c *Connection) Close() {
 	c.Driver.Close()

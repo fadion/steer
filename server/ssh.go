@@ -10,10 +10,12 @@ import (
 	"io"
 	srv "github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
+	"bytes"
 )
 
 type sftp struct {
-	conn     *srv.Client
+	client   *srv.Client
+	conn     *ssh.Client
 	basepath string
 }
 
@@ -48,7 +50,11 @@ func ConnectSsh(cfg Params) (*sftp, error) {
 		return nil, fmt.Errorf("Couldn't connect to SFTP server. System response: %s\n", err.Error())
 	}
 
-	return &sftp{conn: client, basepath: cfg.Path}, nil
+	return &sftp{
+		client:   client,
+		conn:     conn,
+		basepath: cfg.Path,
+	}, nil
 }
 
 // Parse private key.
@@ -103,7 +109,7 @@ func (s *sftp) Upload(path, destination string) error {
 		return err
 	}
 
-	f, err := s.conn.Create(s.makePath(destination))
+	f, err := s.client.Create(s.makePath(destination))
 	if err != nil {
 		return fmt.Errorf("%s couldn't be uploaded.\n", path)
 	}
@@ -121,7 +127,7 @@ func (s *sftp) Upload(path, destination string) error {
 
 // Read a file's contents.
 func (s *sftp) Read(path string) (string, error) {
-	file, err := s.conn.Open(s.makePath(path))
+	file, err := s.client.Open(s.makePath(path))
 	if err != nil {
 		return "", fmt.Errorf("File %s couldn't be read from server.", path)
 	}
@@ -146,16 +152,57 @@ func (s *sftp) Read(path string) (string, error) {
 
 // Delete a file.
 func (s *sftp) Delete(path string) error {
-	if err := s.conn.Remove(path); err != nil {
+	if err := s.client.Remove(path); err != nil {
 		return err
 	}
 
 	return nil
 }
 
+// Execute a command on the server.
+func (s *sftp) Exec(command string) (string, error) {
+	session, err := s.conn.NewSession()
+	if err != nil {
+		return "", err
+	}
+
+	modes := ssh.TerminalModes{
+		ssh.ECHO:          0,
+		ssh.TTY_OP_ISPEED: 14400,
+		ssh.TTY_OP_OSPEED: 14400,
+	}
+
+	// Request pseudo terminal.
+	if err = session.RequestPty("xterm", 80, 40, modes); err != nil {
+		return "", err
+	}
+
+	defer session.Close()
+
+	cmdout := &bytes.Buffer{}
+	cmderr := &bytes.Buffer{}
+	session.Stdout = cmdout
+	session.Stderr = cmderr
+
+	command = fmt.Sprintf("cd %s && %s", s.basepath, command)
+
+	if err = session.Run(command); err != nil {
+		// stdErr is generally more informative, but if it's
+		// empty and the command still failed, return the generic
+		// error.
+		if cmderr.String() == "" {
+			return "", err
+		} else {
+			return "", fmt.Errorf(cmderr.String())
+		}
+	}
+
+	return cmdout.String(), nil
+}
+
 // Close connection.
 func (s *sftp) Close() {
-	s.conn.Close()
+	s.client.Close()
 }
 
 // Append the basepath to path.
@@ -174,11 +221,11 @@ func (s *sftp) createDirs(dir string) error {
 
 	for _, name := range strings.Split(dir, string(os.PathSeparator)) {
 		parents = path.Join(parents, name)
-		err = s.conn.Mkdir(parents)
+		err = s.client.Mkdir(parents)
 		if status, ok := err.(*srv.StatusError); ok {
 			if status.Code == ssh_fx_failure {
 				var fi os.FileInfo
-				fi, err = s.conn.Stat(parents)
+				fi, err = s.client.Stat(parents)
 				if err == nil {
 					if !fi.IsDir() {
 						return nil
