@@ -60,6 +60,10 @@ func Deploy(ctx *cli.Context) error {
 			return
 		}
 
+		if commit == "" {
+			commit = vcs.RefHead()
+		}
+
 		// Create the atomic folder when the config option is set.
 		if isatomic {
 			releasefolder = "/" + fmt.Sprintf("%d", time.Now().Unix()) + "/"
