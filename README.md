@@ -13,7 +13,7 @@ Steer is a deployment tool that relies on Git to keep track of what has changed 
 - [Sync](#sync)
 - [Atomic Deployments](#atomic-deployments)
 - [Logging](#logging)
-- [Pre and Post Deployment Commands](#pre-and-post-deployment-commands)
+- [Hooks](#hooks)
 - [File Includes and Excludes](#file-includes-and-excludes)
 - [Getting Help](#getting-help)
 - [Credits](#credits)
@@ -231,9 +231,9 @@ Finally, you can even delete the log file completely by typing:
 steer log --clear
 ```
 
-## Pre and Post Deployment Commands
+## Hooks
 
-Often it is useful to run a shell command before or after deployment. You may need to clear a cache, update some dependencies, compile assets or whatever your case is. Steer allows to run arbitrary commands either pre or post deployment over SFTP. Keep in mind that commands can't be run via FTP.
+Often it is useful to run a shell command before or after deployment. You may need to clear a cache, update some dependencies, compile assets or whatever your case is. Steer allows to run arbitrary commands either pre or post deployment over SFTP.
 
 To execute commands, add one or more in the `predeploy` or `postdeploy` configuration options. The `path` configuration option also sets the base path where commands are executed. If you need to move folders up or down, you can use `cd` and concat multiple commands with `&&`, like in the example below.
 
