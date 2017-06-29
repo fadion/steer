@@ -155,21 +155,13 @@ Before running a deploy, it's generally not a bad idea to do a preview run. This
 steer preview
 ```
 
-As with deploys, you can pass a list of servers as arguments, and the `--all` and `--commit` options.
-
-```
-steer preview staging -c=SOMEHASH
-```
-
 ## Status
 
-The status command will retrieve the current revision commit and the number of files changed since the latest deployment. It also warns if there's an active deployment process, especially useful when working in a team.
+The status command will retrieve the current revision commit and the number of files changed since the latest deployment. It also warns if there's an active deployment process.
 
 ```
 steer status
 ```
-
-You can also pass a list of servers as arguments, the `--all` and `--commit` options.
 
 ## Sync
 
@@ -177,12 +169,6 @@ Deployment will read the remote revision file and push the files that were chang
 
 ```
 steer sync
-```
-
-With the command executed, the remote revision will hold the latest commit and be in sync with the local repository. You can also pass a list of servers as arguments, the `--all` and `--commit` options.
-
-```
-steer sync --all
 ```
 
 ## Atomic Deployments
@@ -246,16 +232,16 @@ steer log --clear
 
 Often it is useful to run a shell command before or after deployment. You may need to clear a cache, update some dependencies, compile assets or whatever your case is. Steer allows to run arbitrary commands either pre or post deployment over SFTP. Keep in mind that commands can't be run via FTP.
 
-To execute commands, add one or more in the `predeploy` or `postdeploy` configuration option, separated by comma. For example:
+To execute commands, add one or more in the `predeploy` or `postdeploy` configuration options. The `path` configuration option also sets the base path where commands are executed. If you need to move folders up or down, you can use `cd` and concat multiple commands with `&&`, like in the example below.
 
 ```
 [production]
 ;...
-predeploy = rm -rf cache, touch nicefile.html
+predeploy = cd cache && rm -f *.html, touch nicefile.html
 postdeploy = npm update, gulp
 ```
 
-Commands are blocking, meaning that Steer will wait for them to finish before moving on to the next operation. Currently they don't produce output, but as it's trivial to add, if enough people need it, I may implement a configurable output in the future.
+Commands are blocking, meaning that Steer will wait for them to finish before moving on to the next operation. This is by design, as it allows them to finish before continuing with the deploy. Currently they don't produce output, as it would be too verbose for a command line app. However, if enough people need, I may implement it in the future as a configurable option.
 
 ## File Includes and Excludes
 
