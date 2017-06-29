@@ -67,6 +67,8 @@ privatekey = /path/to/key
 path = /
 branch = master
 atomic = false
+reldir = releases
+currdir = current
 logger = false
 include = file.js, folder
 exclude = file.css, file.html
@@ -79,7 +81,7 @@ scheme = sftp
 host = example.com
 port = 22
 username = staging
-password = secret
+privateky = /Users/me/ssh/id_rsa
 ```
 
 What you should worry right now is filling up the `scheme` (ftp or sftp), `host`, `port`, `username` and `password`, so you can connect to your server. The `path` option defines the root of the deployment, which in most cases should be `/`, `public`, or something similar. The `branch` option sets the branch of the repository you want to push to. The rest of the options we'll explore later.
@@ -173,25 +175,26 @@ steer sync
 
 ## Atomic Deployments
 
-When high availability of your site is critical, you can use atomic deployments for virtually no down time during updates. Steer will no longer update files in the base path, but instead push the whole project inside a `releases` directory. To get an idea:
+When high availability of your site is critical, you can use atomic deployments for virtually no down time during updates. Steer will no longer update files in the base path, but instead push the whole project inside a `releases` directory. Using the default configuration options, it expects two directories:
 
 ```
-/current
-/releases
+/current <- symlink to the latest release
+/releases <- holds the releases
    /111111111
    /222222222
    /333333333
 ```
 
-Each deployment will create a new directory to ensure uniqueness, holding every file of the project. The latest directory can be manually symlinked to your web root once it's uploaded (ex: `/current`), transitioning to the updated release without any delay. In the future, I plan to automatically create the symlink in SFTP connections and generally make atomic deployments much more feature rich.
+Each deployment will create a new directory to ensure uniqueness, holding every file of the project. Once the transfer has finished and if it's an SFTP connection, Steer will automatically create a symlink of the latest release to the `current` directory. On FTP you'll have to manually create the symlink.
 
-To activate atomic deployments, you have to enable an `atomic` configuration option. The default directory is `releases` and that should be a good name for most people. However, if for some reason you want to change it, there's also the `releasedir` option. It must be set relative to the `path` option and must be already created on the server.
+To activate atomic deployments, you have to enable an `atomic` configuration option. The default directories are `releases` and `current`, probably good for anyone. However, if you're a control freak and want to change them, there's also the `reldir` and `currdir` options. They must be set relative to the `path` option and already created on the server.
 
 ```
 [production]
 ; ...
 atomic = true
-releasedir = myreleases
+reldir = myreleases
+currdir = currently
 ```
 
 ## Logging

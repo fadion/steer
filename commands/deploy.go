@@ -54,18 +54,18 @@ func Deploy(ctx *cli.Context) error {
 			}
 		}
 
-		// Create the atomic folder when the config option is set.
-		if isatomic {
-			releasefolder = "/" + fmt.Sprintf("%d", time.Now().Unix()) + "/"
-			atomicpath = strings.Trim(cfg.Releasedir, "/") + releasefolder
-			color.Yellow("Starting an atomic deployment on: %s", strings.TrimRight(releasefolder, "/"))
-			fmt.Println()
-		}
-
 		vcs, err := git.New(cfg.Branch)
 		if err != nil {
 			color.Red(err.Error())
 			return
+		}
+
+		// Create the atomic folder when the config option is set.
+		if isatomic {
+			releasefolder = "/" + fmt.Sprintf("%d", time.Now().Unix()) + "/"
+			atomicpath = strings.Trim(cfg.Reldir, "/") + releasefolder
+			color.Yellow("Starting an atomic deployment on: %s", strings.TrimRight(releasefolder, "/"))
+			fmt.Println()
 		}
 
 		files := vcs.Changes(rev, commit)
@@ -152,6 +152,17 @@ func Deploy(ctx *cli.Context) error {
 
 			if isatomic {
 				color.Yellow("\nProject deployed successfully on: %s", strings.TrimRight(releasefolder, "/"))
+
+				// Create the symlink to the /current directory.
+				spin.Prefix = fmt.Sprintf("Creating symlink to '%s'", cfg.Currdir)
+				spin.Start()
+				_, err = conn.Exec(fmt.Sprintf("ln -sfn %s %s", atomicpath, cfg.Currdir))
+				spin.Stop()
+				if err != nil {
+					color.Red("Symlink creation failed with: %s", err.Error())
+				} else {
+					color.Green("Symlink to '%s' created successfully.", cfg.Currdir)
+				}
 			} else {
 				spin.Prefix = "Writing remote revision file "
 				spin.Start()

@@ -29,7 +29,8 @@ type SectionConfig struct {
 	Path       string
 	Branch     string
 	Atomic     bool
-	Releasedir string
+	Reldir     string
+	Currdir    string
 	Include    []string
 	Exclude    []string
 	Logger     bool
@@ -45,7 +46,8 @@ type localDefaults struct {
 	path       string
 	branch     string
 	atomic     bool
-	releasedir string
+	reldir     string
+	currdir    string
 	logger     bool
 	maxclients int
 }
@@ -60,7 +62,8 @@ func NewLocal() *LocalConfig {
 			path:       "/",
 			branch:     "master",
 			atomic:     false,
-			releasedir: "releases",
+			reldir:     "releases",
+			currdir:    "current",
 			logger:     false,
 			maxclients: 3,
 		},
@@ -138,7 +141,8 @@ func (c *LocalConfig) Read() (*ServerConfig, error) {
 			Path:       sec.Key("path").MustString(c.defaults.path),
 			Branch:     sec.Key("branch").MustString(c.defaults.branch),
 			Atomic:     sec.Key("atomic").MustBool(c.defaults.atomic),
-			Releasedir: sec.Key("releasedir").MustString(c.defaults.releasedir),
+			Reldir:     sec.Key("releasedir").MustString(c.defaults.reldir),
+			Currdir:    sec.Key("currentdir").MustString(c.defaults.currdir),
 			Include:    sec.Key("include").Strings(","),
 			Exclude:    sec.Key("exclude").Strings(","),
 			Logger:     sec.Key("logger").MustBool(c.defaults.logger),

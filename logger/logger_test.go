@@ -16,6 +16,7 @@ func (d *MockServerDriver) MkDir(path string) error               { return nil }
 func (d *MockServerDriver) Upload(path, destination string) error { return nil }
 func (d *MockServerDriver) Read(path string) (string, error)      { return logcontents, nil }
 func (d *MockServerDriver) Delete(path string) error              { return nil }
+func (d *MockServerDriver) Exec(command string) (string, error)   { return "", nil }
 func (d *MockServerDriver) Close()                                {}
 
 func TestLogRead(t *testing.T) {
